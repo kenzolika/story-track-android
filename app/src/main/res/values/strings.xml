@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сторис-трек</string>
+    <string name="share_label">Сторис-трек</string>
+    <string name="share_chooser">Отправить в сторис</string>
+</resources>

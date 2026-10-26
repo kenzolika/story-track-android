@@ -1,0 +1,45 @@
+plugins {
+    id "com.android.application"
+}
+
+def runNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+
+android {
+    namespace "dev.kenzolika.storytrack"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "dev.kenzolika.storytrack"
+        minSdk 29
+        targetSdk 34
+        versionCode runNumber
+        versionName "1.0." + runNumber
+        buildConfigField "String", "BASE_URL", "\"https://story-track.kenzolika.workers.dev\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    // Ключ лежит в приватном репозитории — так каждая сборка ставится поверх предыдущей
+    signingConfigs {
+        release {
+            storeFile file("release.jks")
+            storePassword "storytrack-2026"
+            keyAlias "storytrack"
+            keyPassword "storytrack-2026"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
