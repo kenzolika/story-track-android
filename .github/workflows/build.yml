@@ -23,7 +23,20 @@ jobs:
         with:
           gradle-version: "8.9"
 
+      - name: Restore signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "SIGNING_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Секрета с ключом нет — APK будет подписан отладочным ключом"
+          fi
+
       - name: Build release APK
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
         run: gradle :app:assembleRelease --stacktrace
 
       - name: Rename APK
@@ -35,10 +48,11 @@ jobs:
           path: story-track-*.apk
 
       - name: Publish release
+        if: github.repository == 'kenzolika/story-track-android'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: Сторис-трек 1.0.${{ github.run_number }}
-          body: "Скачай APK ниже и установи поверх предыдущей версии."
+          body: "Скачай `story-track-1.0.${{ github.run_number }}.apk` ниже и установи. Обновление ставится поверх предыдущей версии. Подробности — в README."
           files: story-track-*.apk
           make_latest: true

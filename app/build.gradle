@@ -21,20 +21,26 @@ android {
         buildConfig true
     }
 
-    // Ключ лежит в приватном репозитории — так каждая сборка ставится поверх предыдущей
+    // Ключ подписи приходит из GitHub Secrets (в репозитории его нет).
+    // Без секретов (например, в форке) сборка подписывается отладочным ключом.
+    def ksPath = System.getenv("SIGNING_KEYSTORE_PATH")
+    def hasKey = ksPath != null && file(ksPath).exists()
+
     signingConfigs {
         release {
-            storeFile file("release.jks")
-            storePassword "storytrack-2026"
-            keyAlias "storytrack"
-            keyPassword "storytrack-2026"
+            if (hasKey) {
+                storeFile file(ksPath)
+                storePassword System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias System.getenv("SIGNING_KEY_ALIAS") ?: "storytrack"
+                keyPassword System.getenv("SIGNING_STORE_PASSWORD")
+            }
         }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig hasKey ? signingConfigs.release : signingConfigs.debug
         }
     }
 
