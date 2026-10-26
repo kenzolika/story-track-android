@@ -37,7 +37,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WebView.setWebContentsDebuggingEnabled(true);
+        // Отладка WebView по USB — только в отладочных сборках
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
 
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#0E0E12"));
